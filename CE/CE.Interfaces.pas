@@ -22,7 +22,7 @@ type
   ICECompile = interface
     ['{C6E283C2-6A38-444E-859E-F3F0A66571F0}']
 
-    procedure Compile(const LanguageId: string; const CompilerId: string; const Code: string; const Callback: TProc<TCECompileResult>);
+    procedure Compile(const LanguageId: string; const CompilerId: string; const Code: string; const Arguments: string; const Callback: TProc<TCECompileResult>);
   end;
 
 implementation

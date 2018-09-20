@@ -30,15 +30,35 @@ type
     property Description: string read FDescription;
   end;
 
+  TCEAssemblyLine = class
+  protected
+    FText: string;
+  public
+    property Text: string read FText;
+
+    constructor Create(const Text: string);
+  end;
+
+  TCEErrorLine = class
+  private
+    FText: string;
+  public
+    property Text: string read FText;
+
+    constructor Create(const Text: string);
+  end;
+
   TCECompileResult = class
   protected
     FSuccessful: Boolean;
-    FCompilerOutput: string;
+    FCompilerOutput: TList<TCEErrorLine>;
+    FAssembly: TList<TCEAssemblyLine>;
   public
     property Successful: Boolean read FSuccessful;
-    property CompilerOutput: string read FCompilerOutput;
+    property CompilerOutput: TList<TCEErrorLine> read FCompilerOutput;
+    property Assembly: TList<TCEAssemblyLine> read FAssembly;
 
-    constructor Create(const Success: Boolean; const Output: string);
+    constructor Create(const Success: Boolean);
   end;
 
   TCELanguages = TList<TCELanguage>;
@@ -65,10 +85,25 @@ end;
 
 { TCECompileResult }
 
-constructor TCECompileResult.Create(const Success: Boolean; const Output: string);
+constructor TCECompileResult.Create(const Success: Boolean);
 begin
   FSuccessful := Success;
-  FCompilerOutput := Output;
+  FCompilerOutput := TObjectList<TCEErrorLine>.Create;
+  FAssembly := TObjectList<TCEAssemblyLine>.Create;
+end;
+
+{ TCEAssemblyLine }
+
+constructor TCEAssemblyLine.Create(const Text: string);
+begin
+  FText := Text;
+end;
+
+{ TCEErrorLine }
+
+constructor TCEErrorLine.Create(const Text: string);
+begin
+  FText := Text;
 end;
 
 end.
