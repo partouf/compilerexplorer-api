@@ -64,7 +64,7 @@ var
   Compiler: TJsonValue;
   CompilerObject: TJSONObject;
 begin
-  Result := TObjectList<TCECompiler>.Create;
+  Result := TCECompilers.Create;
 
   for Compiler in Json do
   begin

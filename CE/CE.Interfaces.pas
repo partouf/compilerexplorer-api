@@ -4,6 +4,7 @@ interface
 
 uses
   CE.Types,
+  CE.ClientState,
   System.SysUtils;
 
 type
@@ -23,6 +24,12 @@ type
     ['{C6E283C2-6A38-444E-859E-F3F0A66571F0}']
 
     procedure Compile(const LanguageId: string; const CompilerId: string; const Code: string; const Arguments: string; const Callback: TProc<TCECompileResult>);
+  end;
+
+  ICELinkInfo = interface
+    ['{84FC3CEA-BC28-47C5-8400-58D3013FEAB6}']
+
+    procedure GetClientState(const Uri: string; const Callback: TProc<TCEClientState>);
   end;
 
 implementation

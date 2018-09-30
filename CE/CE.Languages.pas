@@ -65,7 +65,7 @@ var
   Lang: TJsonValue;
   LangObject: TJSONObject;
 begin
-  Result := TObjectList<TCELanguage>.Create;
+  Result := TCELanguages.Create;
 
   for Lang in Json do
   begin

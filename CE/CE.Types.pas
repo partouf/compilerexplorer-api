@@ -61,8 +61,15 @@ type
     constructor Create(const Success: Boolean);
   end;
 
-  TCELanguages = TList<TCELanguage>;
-  TCECompilers = TList<TCECompiler>;
+  TCELanguages = class(TObjectList<TCELanguage>)
+  public
+    function GetById(const Id: string): TCELanguage;
+  end;
+
+  TCECompilers = class(TObjectList<TCECompiler>)
+  public
+    function FindById(const Id: string): TCECompiler;
+  end;
 
 implementation
 
@@ -104,6 +111,42 @@ end;
 constructor TCEErrorLine.Create(const Text: string);
 begin
   FText := Text;
+end;
+
+{ TCELanguages }
+
+function TCELanguages.GetById(const Id: string): TCELanguage;
+var
+  Language: TCELanguage;
+begin
+  Result := nil;
+
+  for Language in Self do
+  begin
+    if Language.Id = Id then
+    begin
+      Result := Language;
+      Exit;
+    end;
+  end;
+end;
+
+{ TCECompilers }
+
+function TCECompilers.FindById(const Id: string): TCECompiler;
+var
+  Compiler: TCECompiler;
+begin
+  Result := nil;
+
+  for Compiler in Self do
+  begin
+    if Compiler.CompilerId = Id then
+    begin
+      Result := Compiler;
+      Exit;
+    end;
+  end;
 end;
 
 end.
