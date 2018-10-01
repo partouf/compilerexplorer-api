@@ -20,7 +20,7 @@ uses
 
 procedure TCELinkInfo.GetClientState(const Uri: string; const Callback: TProc<TCEClientState>);
 begin
-  FRestClient.BaseURL := Uri.Replace('/z/', '/shortlinkinfo/').Replace('/y/', '/shortlinkinfo/');
+  FRestClient.BaseURL := Uri.Replace('/z/', '/api/shortlinkinfo/').Replace('/y/', '/api/shortlinkinfo/');
 
   FRestRequest.ExecuteAsync(
     procedure
