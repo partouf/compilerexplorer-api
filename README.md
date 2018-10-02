@@ -1,2 +1,2 @@
 # compilerexplorer-api
-Delphi API for compiler explorer
+Delphi API for [Compiler Explorer](https://github.com/mattgodbolt/compiler-explorer)
