@@ -32,6 +32,12 @@ type
     procedure GetClientState(const Uri: string; const Callback: TProc<TCEClientState>);
   end;
 
+  ICELinkSaver = interface
+    ['{549909F6-941F-4AD5-A3DF-DB451E62DE25}']
+
+    procedure Save(const LanguageId: string; const CompilerId: string; const Code: string; const Arguments: string; const Callback: TProc<string>);
+  end;
+
 implementation
 
 
