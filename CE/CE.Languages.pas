@@ -23,7 +23,7 @@ type
 implementation
 
 uses
-  System.Generics.Collections;
+  System.Generics.Collections, System.Generics.Defaults;
 
 { TCELanguages }
 
@@ -79,6 +79,13 @@ begin
       )
     );
   end;
+
+  Result.Sort(
+    TDelegatedComparer<TCELanguage>.Create(
+      function(const A, B: TCELanguage): Integer
+      begin
+        Result := CompareStr(A.LanguageName, B.LanguageName);
+      end));
 end;
 
 end.
