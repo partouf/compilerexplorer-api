@@ -31,7 +31,7 @@ begin
   FRestRequest := TRESTRequest.Create(nil);
   FRestClient := TRESTClient.Create(nil);
 
-  FRestClient.BaseURL := 'https://godbolt.org/';
+  FRestClient.BaseURL := 'https://godbolt.org/beta/';
   FRestClient.HandleRedirects := True;
 
   FRestRequest.Client := FRestClient;

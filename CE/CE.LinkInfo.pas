@@ -14,13 +14,21 @@ type
 implementation
 
 uses
-  System.JSON;
+  System.JSON, System.StrUtils, FMX.Types;
 
 { TCELinkInfo }
 
 procedure TCELinkInfo.GetClientState(const Uri: string; const Callback: TProc<TCEClientState>);
 begin
-  FRestClient.BaseURL := Uri.Replace('/z/', '/api/shortlinkinfo/').Replace('/y/', '/api/shortlinkinfo/');
+  FRestClient.BaseURL := Uri;
+
+  // temporary redirect to beta
+  if not ContainsText(FRestClient.BaseURL, '/beta/') then
+  begin
+    FRestClient.BaseURL := FRestClient.BaseURL.Replace('godbolt.org/', 'godbolt.org/beta/');
+  end;
+
+  FRestClient.BaseURL := FRestClient.BaseURL.Replace('/z/', '/api/shortlinkinfo/').Replace('/resetlayout/', '/api/shortlinkinfo/');
 
   FRestRequest.ExecuteAsync(
     procedure
