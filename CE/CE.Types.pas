@@ -59,6 +59,7 @@ type
     property Assembly: TList<TCEAssemblyLine> read FAssembly;
 
     constructor Create(const Success: Boolean);
+    destructor Destroy; override;
   end;
 
   TCELanguages = class(TObjectList<TCELanguage>)
@@ -97,6 +98,13 @@ begin
   FSuccessful := Success;
   FCompilerOutput := TObjectList<TCEErrorLine>.Create;
   FAssembly := TObjectList<TCEAssemblyLine>.Create;
+end;
+
+destructor TCECompileResult.Destroy;
+begin
+  FAssembly.Free;
+  FCompilerOutput.Free;
+  inherited;
 end;
 
 { TCEAssemblyLine }

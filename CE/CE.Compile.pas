@@ -30,18 +30,22 @@ uses
 { TCECompileViaREST }
 
 procedure TCECompileViaREST.Compile(const LanguageId, CompilerId, Code, Arguments: string; const Callback: TProc<TCECompileResult>);
+var
+  JSONObj: TJSONObject;
 begin
   FRestRequest.Resource := 'api/compiler/' + CompilerId + '/compile';
   FRestRequest.Method := TRESTRequestMethod.rmPOST;
   FRestRequest.Body.ClearBody;
 
-  FRestRequest.Body.Add(CreateJSONCompileRequest(Code, Arguments));
+  JSONObj := CreateJSONCompileRequest(Code, Arguments);
+  FRestRequest.Body.Add(JSONObj);
 
   FRestRequest.ExecuteAsync(
     procedure
     var
       CompileResult: TCECompileResult;
     begin
+      JSONObj.Free;
       CompileResult := GetCompileResultFromJson(FRestResponse.JSONValue as TJSONObject);
       FHasReceivedData := True;
 
@@ -51,6 +55,7 @@ begin
     True,
     procedure(Error: TObject)
     begin
+      JSONObj.Free;
       FHasErrors := True;
     end
   );
@@ -106,6 +111,8 @@ begin
   Result := Text;
   Result := ReplaceStr(Result, #$1b'[0m', '');
   Result := ReplaceStr(Result, #$1b'[1m', '');
+  Result := ReplaceStr(Result, #$1b'[0;1;30m', '');
+  Result := ReplaceStr(Result, #$1b'[0;1;31m', '');
   Result := ReplaceStr(Result, #$1b'[0;1;32m', '');
   Result := ReplaceStr(Result, #$1b'[0;1;35m', '');
 end;

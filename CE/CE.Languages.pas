@@ -3,6 +3,7 @@ unit CE.Languages;
 interface
 
 uses
+  System.Generics.Defaults,
   CE.Interfaces,
   CE.RESTBase,
   CE.Types,
@@ -12,6 +13,8 @@ uses
 type
   TCELanguagesFromRest = class(TCERESTBase, ICELanguages)
   protected
+    FCompareDelegate: IComparer<TCELanguage>;
+
     function GetLanguagesFromJson(const Json: TJsonArray): TCELanguages;
   public
     constructor Create;
@@ -23,13 +26,19 @@ type
 implementation
 
 uses
-  System.Generics.Collections, System.Generics.Defaults;
+  System.Generics.Collections;
 
 { TCELanguages }
 
 constructor TCELanguagesFromRest.Create;
 begin
   inherited Create;
+
+  FCompareDelegate := TDelegatedComparer<TCELanguage>.Create(
+    function(const A, B: TCELanguage): Integer
+    begin
+      Result := CompareStr(A.LanguageName, B.LanguageName);
+    end);
 
   FRestRequest.Resource := 'api/languages';
 end;
@@ -80,12 +89,7 @@ begin
     );
   end;
 
-  Result.Sort(
-    TDelegatedComparer<TCELanguage>.Create(
-      function(const A, B: TCELanguage): Integer
-      begin
-        Result := CompareStr(A.LanguageName, B.LanguageName);
-      end));
+  Result.Sort(FCompareDelegate);
 end;
 
 end.
