@@ -73,6 +73,8 @@ function TCELanguagesFromRest.GetLanguagesFromJson(const Json: TJsonArray): TCEL
 var
   Lang: TJsonValue;
   LangObject: TJSONObject;
+  DefCompiler: TJSONValue;
+  DefCompilerStr: string;
 begin
   Result := TCELanguages.Create;
 
@@ -80,11 +82,18 @@ begin
   begin
     LangObject := (Lang as TJsonObject);
 
+    DefCompiler := LangObject.GetValue('defaultCompiler');
+    if Assigned(DefCompiler) then
+      DefCompilerStr := DefCompiler.Value
+    else
+      DefCompilerStr := '';
+
     Result.Add(
       TCELanguage.Create(
         LangObject.GetValue('id').Value,
         LangObject.GetValue('name').Value,
-        LangObject.GetValue('example').Value
+        LangObject.GetValue('example').Value,
+        DefCompilerStr
       )
     );
   end;

@@ -11,12 +11,50 @@ type
     FId: string;
     FLanguageName: string;
     FExampleCode: string;
+    FDefaultCompilerId: string;
   public
-    constructor Create(const Id: string; const Name: string; const Example: string);
+    constructor Create(const Id: string; const Name: string; const Example: string; const DefaultCompilerId: string);
 
     property Id: string read FId;
     property LanguageName: string read FLanguageName;
     property ExampleCode: string read FExampleCode;
+    property DefaultCompilerId: string read FDefaultCompilerId;
+  end;
+
+  TCELibrary = class;
+
+  TCELibraryVersion = class
+  private
+    FLibrary: TCELibrary;
+    FPath: string;
+    FVersion: string;
+  public
+    constructor Create(const Lib: TCELibrary; const Version, Path: string);
+
+    property Version: string read FVersion;
+    property Path: string read FPath;
+  end;
+
+  TCELibrary = class
+  private
+    FName: string;
+    FId: string;
+    FDescription: string;
+    FVersions: TList<TCELibraryVersion>;
+    FUrl: string;
+  public
+    constructor Create(const Id, Name, Url: string);
+    destructor Destroy; override;
+
+    property Id: string read FId;
+    property Name: string read FName;
+    property Description: string read FDescription write FDescription;
+    property Url: string read FUrl;
+    property Versions: TList<TCELibraryVersion> read FVersions;
+  end;
+
+  TCELibraries = class(TObjectList<TCELibrary>)
+  public
   end;
 
   TCECompiler = class
@@ -76,11 +114,12 @@ implementation
 
 { TCELanguage }
 
-constructor TCELanguage.Create(const Id, Name, Example: string);
+constructor TCELanguage.Create(const Id, Name, Example, DefaultCompilerId: string);
 begin
   FId := Id;
   FLanguageName := Name;
   FExampleCode := Example;
+  FDefaultCompilerId := '';
 end;
 
 { TCECompiler }
@@ -155,6 +194,37 @@ begin
       Exit;
     end;
   end;
+end;
+
+{ TCELibrary }
+
+constructor TCELibrary.Create(const Id, Name, Url: string);
+begin
+  inherited Create;
+
+  FId := Id;
+  FName := Name;
+  FDescription := '';
+  FUrl := Url;
+  FVersions := TObjectList<TCELibraryVersion>.Create;
+end;
+
+destructor TCELibrary.Destroy;
+begin
+  FVersions.Free;
+
+  inherited;
+end;
+
+{ TCELibraryVersion }
+
+constructor TCELibraryVersion.Create(const Lib: TCELibrary; const Version, Path: string);
+begin
+  inherited Create;
+
+  FLibrary := Lib;
+  FVersion := Version;
+  FPath := Path;
 end;
 
 end.

@@ -20,6 +20,12 @@ type
     procedure GetCompilers(const LanguageId: string; const Callback: TProc<TCECompilers>);
   end;
 
+  ICELibraries = interface
+    ['{923B7084-D352-4537-B0A3-5FA56DEB54EE}']
+
+    procedure GetLibraries(const LanguageId: string; const Callback: TProc<TCELibraries>);
+  end;
+
   ICECompile = interface
     ['{C6E283C2-6A38-444E-859E-F3F0A66571F0}']
 
