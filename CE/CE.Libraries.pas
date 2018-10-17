@@ -48,6 +48,9 @@ var
   VersionVal: TJSONValue;
   VersionObj: TJSONObject;
   DescVal: TJSONValue;
+  LibVersion: TCELibraryVersion;
+  PathsArr: TJSONArray;
+  Path: TJSONValue;
 begin
   Result := TCELibraries.Create;
 
@@ -69,13 +72,17 @@ begin
     begin
       VersionObj := VersionVal as TJSONObject;
 
-      Lib.Versions.Add(
-        TCELibraryVersion.Create(
+      LibVersion := TCELibraryVersion.Create(
           Lib,
-          VersionObj.GetValue('version').Value,
-          VersionObj.GetValue('path').Value
-        )
-      );
+          VersionObj.GetValue('version').Value);
+
+      PathsArr := VersionObj.GetValue('path') as TJSONArray;
+      for Path in PathsArr do
+      begin
+        LibVersion.Paths.Add(Path.Value);
+      end;
+
+      Lib.Versions.Add(LibVersion);
     end;
 
     Result.Add(Lib);

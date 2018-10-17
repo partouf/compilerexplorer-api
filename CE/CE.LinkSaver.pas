@@ -3,14 +3,15 @@ unit CE.LinkSaver;
 interface
 
 uses
-  CE.Interfaces, CE.RESTBase, CE.Types, CE.ClientState, System.SysUtils;
+  CE.Interfaces, CE.RESTBase, CE.Types, CE.ClientState, System.SysUtils,
+  System.Generics.Collections;
 
 type
   TCELinkSaver = class(TCERESTBase, ICELinkSaver)
   public
     constructor Create;
 
-    procedure Save(const LanguageId: string; const CompilerId: string; const Code: string; const Arguments: string; const Callback: TProc<string>);
+    procedure Save(const LanguageId: string; const CompilerId: string; const Code: string; const Arguments: string; const SelectedLibraries: TList<TCELibraryVersion>; const Callback: TProc<string>);
   end;
 
 implementation
@@ -28,11 +29,12 @@ begin
   FRestRequest.Method := TRESTRequestMethod.rmPOST;
 end;
 
-procedure TCELinkSaver.Save(const LanguageId, CompilerId, Code, Arguments: string; const Callback: TProc<string>);
+procedure TCELinkSaver.Save(const LanguageId, CompilerId, Code, Arguments: string; const SelectedLibraries: TList<TCELibraryVersion>; const Callback: TProc<string>);
 var
   State: TCEClientState;
   Session: TCEClientStateSession;
   Compiler: TCEClientStateCompiler;
+  Lib: TCELibraryVersion;
 begin
   State := TCEClientState.Create;
   Session := TCEClientStateSession.Create;
@@ -43,6 +45,14 @@ begin
 
   Compiler.Id := CompilerId;
   Compiler.Options := Arguments;
+
+  for Lib in SelectedLibraries do
+  begin
+    Compiler.Libs.Add(
+      TCEClientStateLibraryVersion.Create(
+        Lib.lib.Id,
+        Lib.Version));
+  end;
 
   Session.Compilers.Add(Compiler);
 

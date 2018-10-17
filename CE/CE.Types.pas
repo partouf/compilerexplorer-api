@@ -3,7 +3,7 @@ unit CE.Types;
 interface
 
 uses
-  System.Generics.Collections;
+  System.Generics.Collections, System.Classes;
 
 type
   TCELanguage = class
@@ -26,13 +26,15 @@ type
   TCELibraryVersion = class
   private
     FLibrary: TCELibrary;
-    FPath: string;
+    FPaths: TStrings;
     FVersion: string;
   public
-    constructor Create(const Lib: TCELibrary; const Version, Path: string);
+    constructor Create(const Lib: TCELibrary; const Version: string);
+    destructor Destroy; override;
 
+    property Lib: TCELibrary read FLibrary;
     property Version: string read FVersion;
-    property Path: string read FPath;
+    property Paths: TStrings read FPaths;
   end;
 
   TCELibrary = class
@@ -55,6 +57,8 @@ type
 
   TCELibraries = class(TObjectList<TCELibrary>)
   public
+    function GetLibraryById(const Id: string): TCELibrary;
+    function GetLibraryVersion(const LibraryId: string; const Version: string): TCELibraryVersion;
   end;
 
   TCECompiler = class
@@ -218,13 +222,59 @@ end;
 
 { TCELibraryVersion }
 
-constructor TCELibraryVersion.Create(const Lib: TCELibrary; const Version, Path: string);
+constructor TCELibraryVersion.Create(const Lib: TCELibrary; const Version: string);
 begin
   inherited Create;
 
   FLibrary := Lib;
   FVersion := Version;
-  FPath := Path;
+  FPaths := TStringList.Create;
+end;
+
+destructor TCELibraryVersion.Destroy;
+begin
+  FPaths.Free;
+
+  inherited;
+end;
+
+{ TCELibraries }
+
+function TCELibraries.GetLibraryById(const Id: string): TCELibrary;
+var
+  Lib: TCELibrary;
+begin
+  Result := nil;
+
+  for Lib in Self do
+  begin
+    if Lib.Id = Id then
+    begin
+      Result := Lib;
+      Exit;
+    end;
+  end;
+end;
+
+function TCELibraries.GetLibraryVersion(const LibraryId, Version: string): TCELibraryVersion;
+var
+  Lib: TCELibrary;
+  LibVersion: TCELibraryVersion;
+begin
+  Result := nil;
+
+  Lib := GetLibraryById(LibraryId);
+  if Assigned(Lib) then
+  begin
+    for LibVersion in Lib.Versions do
+    begin
+      if LibVersion.Version = Version then
+      begin
+        Result := LibVersion;
+        Exit;
+      end;
+    end;
+  end;
 end;
 
 end.

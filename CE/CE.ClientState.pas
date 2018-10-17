@@ -6,14 +6,26 @@ uses
   System.Generics.Collections, System.JSON, System.Classes;
 
 type
+  TCEClientStateLibraryVersion = class
+  private
+    FVersion: string;
+    FLibraryId: string;
+  public
+    constructor Create(const Id, Version: string);
+
+    property LibraryId: string read FLibraryId write FLibraryId;
+    property Version: string read FVersion write FVersion;
+  end;
+
   TCEClientStateCompiler = class
   private
     FId: string;
     FOptions: string;
     FSpecialOutputs: TStrings;
-    FLibs: TStrings;
+    FLibs: TList<TCEClientStateLibraryVersion>;
   public
     constructor Create;
+    destructor Destroy; override;
 
     procedure LoadFromJson(const Compiler: TJSONObject);
     function ToJSON: TJSONObject;
@@ -21,7 +33,7 @@ type
     property Id: string read FId write FId;
     property Options: string read FOptions write FOptions;
     property SpecialOutputs: TStrings read FSpecialOutputs;
-    property Libs: TStrings read FLibs;
+    property Libs: TList<TCEClientStateLibraryVersion> read FLibs;
   end;
 
   TCEClientStateSession = class
@@ -168,23 +180,45 @@ begin
   inherited Create;
 
   FSpecialOutputs := TStringList.Create;
-  FLibs := TStringList.Create;
+  FLibs := TObjectList<TCEClientStateLibraryVersion>.Create;
+end;
+
+destructor TCEClientStateCompiler.Destroy;
+begin
+  FSpecialOutputs.Free;
+  FLibs.Free;
+
+  inherited;
 end;
 
 procedure TCEClientStateCompiler.LoadFromJson(const Compiler: TJSONObject);
+var
+  LibArr: TJSONArray;
+  LibVal: TJSONValue;
+  LibObj: TJSONObject;
 begin
   FId := Compiler.GetValue('id').Value;
   FOptions := Compiler.GetValue('options').Value;
   FLibs.Clear;
   FSpecialOutputs.Clear;
+
+  LibArr := Compiler.GetValue('libs') as TJSONArray;
+  for LibVal in LibArr do
+  begin
+    LibObj := (LibVal as TJSONObject);
+    FLibs.Add(TCEClientStateLibraryVersion.Create(
+      LibObj.GetValue('name').Value,
+      LibObj.GetValue('ver').Value));
+  end;
 end;
 
 function TCEClientStateCompiler.ToJSON: TJSONObject;
 var
   LibsArr: TJSONArray;
-  Lib: string;
+  Lib: TCEClientStateLibraryVersion;
   OutputArr: TJSONArray;
   Outp: string;
+  LibVerObj: TJSONObject;
 begin
   Result := TJSONObject.Create;
   Result.AddPair('id', FId);
@@ -193,7 +227,11 @@ begin
   LibsArr := TJSONArray.Create;
   for Lib in FLibs do
   begin
-    LibsArr.Add(Lib);
+    LibVerObj := TJSONObject.Create;
+    LibVerObj.AddPair('name', Lib.LibraryId);
+    LibVerObj.AddPair('ver', Lib.Version);
+
+    LibsArr.Add(LibVerObj);
   end;
 
   Result.AddPair('libs', LibsArr);
@@ -205,6 +243,14 @@ begin
   end;
 
   Result.AddPair('specialoutputs', OutputArr);
+end;
+
+{ TCEClientStateLibraryVersion }
+
+constructor TCEClientStateLibraryVersion.Create(const Id, Version: string);
+begin
+  FLibraryId := Id;
+  FVersion := Version;
 end;
 
 end.

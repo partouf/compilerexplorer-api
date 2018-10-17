@@ -5,7 +5,8 @@ interface
 uses
   CE.Types,
   CE.ClientState,
-  System.SysUtils;
+  System.SysUtils,
+  System.Generics.Collections;
 
 type
   ICELanguages = interface
@@ -29,7 +30,7 @@ type
   ICECompile = interface
     ['{C6E283C2-6A38-444E-859E-F3F0A66571F0}']
 
-    procedure Compile(const LanguageId: string; const CompilerId: string; const Code: string; const Arguments: string; const Callback: TProc<TCECompileResult>);
+    procedure Compile(const LanguageId: string; const CompilerId: string; const Code: string; const Arguments: string; const SelectedLibraries: TList<TCELibraryVersion>; const Callback: TProc<TCECompileResult>);
   end;
 
   ICELinkInfo = interface
@@ -41,7 +42,7 @@ type
   ICELinkSaver = interface
     ['{549909F6-941F-4AD5-A3DF-DB451E62DE25}']
 
-    procedure Save(const LanguageId: string; const CompilerId: string; const Code: string; const Arguments: string; const Callback: TProc<string>);
+    procedure Save(const LanguageId: string; const CompilerId: string; const Code: string; const Arguments: string; const SelectedLibraries: TList<TCELibraryVersion>; const Callback: TProc<string>);
   end;
 
 implementation

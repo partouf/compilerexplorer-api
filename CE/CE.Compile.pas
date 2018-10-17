@@ -16,20 +16,20 @@ type
     procedure PopulateAssembly(const AssemblyDestination: TList<TCEAssemblyLine>; const AssemblySource: TJSONArray);
     function RemoveLineColoring(const Text: string): string;
   protected
-    function CreateJSONCompileRequest(const Code: string; const Arguments: string): TJSONObject;
+    function CreateJSONCompileRequest(const Code, Arguments: string; const SelectedLibraries: TList<TCELibraryVersion>): TJSONObject;
     function GetCompileResultFromJson(const JSON: TJSONObject): TCECompileResult;
   public
-    procedure Compile(const LanguageId, CompilerId, Code: string; const Arguments: string; const Callback: TProc<TCECompileResult>);
+    procedure Compile(const LanguageId, CompilerId, Code: string; const Arguments: string; const SelectedLibraries: TList<TCELibraryVersion>; const Callback: TProc<TCECompileResult>);
   end;
 
 implementation
 
 uses
-  REST.Types, System.StrUtils;
+  REST.Types, System.StrUtils, System.Classes;
 
 { TCECompileViaREST }
 
-procedure TCECompileViaREST.Compile(const LanguageId, CompilerId, Code, Arguments: string; const Callback: TProc<TCECompileResult>);
+procedure TCECompileViaREST.Compile(const LanguageId, CompilerId, Code, Arguments: string; const SelectedLibraries: TList<TCELibraryVersion>; const Callback: TProc<TCECompileResult>);
 var
   JSONObj: TJSONObject;
 begin
@@ -37,7 +37,7 @@ begin
   FRestRequest.Method := TRESTRequestMethod.rmPOST;
   FRestRequest.Body.ClearBody;
 
-  JSONObj := CreateJSONCompileRequest(Code, Arguments);
+  JSONObj := CreateJSONCompileRequest(Code, Arguments, SelectedLibraries);
   FRestRequest.Body.Add(JSONObj);
 
   FRestRequest.ExecuteAsync(
@@ -61,16 +61,30 @@ begin
   );
 end;
 
-function TCECompileViaREST.CreateJSONCompileRequest(const Code, Arguments: string): TJSONObject;
+function TCECompileViaREST.CreateJSONCompileRequest(const Code, Arguments: string; const SelectedLibraries: TList<TCELibraryVersion>): TJSONObject;
 var
   Options: TJSONObject;
+  MoreArguments: string;
+  Lib: TCELibraryVersion;
+  Path: string;
 begin
   Result := TJSONObject.Create;
 
   Result.AddPair('source', Code);
 
   Options := TJSONObject.Create;
-  Options.AddPair('userArguments', Arguments);
+
+  MoreArguments := '';
+  for Lib in SelectedLibraries do
+  begin
+    for Path in Lib.Paths do
+    begin
+      // todo: use compiler includeFlag
+      MoreArguments := MoreArguments + ' -I"' + Path + '"';
+    end;
+  end;
+
+  Options.AddPair('userArguments', Arguments + MoreArguments);
 
   Result.AddPair('options', Options);
 end;
