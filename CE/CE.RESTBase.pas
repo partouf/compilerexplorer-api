@@ -31,12 +31,14 @@ begin
   FRestRequest := TRESTRequest.Create(nil);
   FRestClient := TRESTClient.Create(nil);
 
-  FRestClient.BaseURL := 'https://godbolt.org/beta/';
+  FRestClient.BaseURL := 'https://godbolt.org/beta';
   FRestClient.HandleRedirects := True;
 
   FRestRequest.Client := FRestClient;
   FRestRequest.Response := FRestResponse;
   FRestRequest.SynchronizedEvents := False;
+
+  FRestRequest.Accept := 'application/json';
 end;
 
 destructor TCERESTBase.Destroy;

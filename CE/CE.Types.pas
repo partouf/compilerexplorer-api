@@ -119,7 +119,7 @@ begin
   FId := Id;
   FLanguageName := Name;
   FExampleCode := Example;
-  FDefaultCompilerId := '';
+  FDefaultCompilerId := DefaultCompilerId;
 end;
 
 { TCECompiler }

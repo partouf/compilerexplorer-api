@@ -10,8 +10,6 @@ type
   protected
     function GetLibrariesFromJson(const LibrariesArr: TJSONArray): TCELibraries;
   public
-    constructor Create;
-
     procedure GetLibraries(const LanguageId: string; const Callback: TProc<TCELibraries>);
   end;
 
@@ -19,14 +17,9 @@ implementation
 
 { TCELibrariesFromRest }
 
-constructor TCELibrariesFromRest.Create;
-begin
-  inherited Create;
-end;
-
 procedure TCELibrariesFromRest.GetLibraries(const LanguageId: string; const Callback: TProc<TCELibraries>);
 begin
-  FRestRequest.Resource := '/api/libraries/' + LanguageId;
+  FRestRequest.Resource := 'api/libraries/' + LanguageId;
 
   FRestRequest.ExecuteAsync(
     procedure
