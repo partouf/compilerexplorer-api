@@ -30,8 +30,10 @@ type
     procedure LoadFromJson(const Compiler: TJSONObject);
     function ToJSON: TJSONObject;
 
+    function GetShortLibrarySummary: string;
+
     property Id: string read FId write FId;
-    property Options: string read FOptions write FOptions;
+    property Arguments: string read FOptions write FOptions;
     property SpecialOutputs: TStrings read FSpecialOutputs;
     property Libs: TList<TCEClientStateLibraryVersion> read FLibs;
   end;
@@ -189,6 +191,21 @@ begin
   FLibs.Free;
 
   inherited;
+end;
+
+function TCEClientStateCompiler.GetShortLibrarySummary: string;
+var
+  Lib: TCEClientStateLibraryVersion;
+begin
+  Result := '';
+
+  for Lib in FLibs do
+  begin
+    if Result <> '' then
+      Result := Result + ', ' + Lib.LibraryId
+    else
+      Result := Lib.LibraryId;
+  end;
 end;
 
 procedure TCEClientStateCompiler.LoadFromJson(const Compiler: TJSONObject);

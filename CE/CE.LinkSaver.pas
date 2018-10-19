@@ -44,7 +44,7 @@ begin
   Session.Source := Code;
 
   Compiler.Id := CompilerId;
-  Compiler.Options := Arguments;
+  Compiler.Arguments := Arguments;
 
   for Lib in SelectedLibraries do
   begin

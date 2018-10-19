@@ -45,6 +45,9 @@ type
     procedure Save(const LanguageId: string; const CompilerId: string; const Code: string; const Arguments: string; const SelectedLibraries: TList<TCELibraryVersion>; const Callback: TProc<string>);
   end;
 
+const
+  UrlCompilerExplorer = 'https://godbolt.org/beta';
+
 implementation
 
 

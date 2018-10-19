@@ -23,6 +23,9 @@ type
 
 implementation
 
+uses
+  CE.Interfaces;
+
 { TCERESTBase }
 
 constructor TCERESTBase.Create;
@@ -31,7 +34,7 @@ begin
   FRestRequest := TRESTRequest.Create(nil);
   FRestClient := TRESTClient.Create(nil);
 
-  FRestClient.BaseURL := 'https://godbolt.org/beta';
+  FRestClient.BaseURL := UrlCompilerExplorer;
   FRestClient.HandleRedirects := True;
 
   FRestRequest.Client := FRestClient;
