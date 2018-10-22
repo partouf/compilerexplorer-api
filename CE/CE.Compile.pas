@@ -124,11 +124,18 @@ function TCECompileViaREST.RemoveLineColoring(const Text: string): string;
 begin
   Result := Text;
   Result := ReplaceStr(Result, #$1b'[0m', '');
+  Result := ReplaceStr(Result, #$1b'[01m', '');
+  Result := ReplaceStr(Result, #$1b'[m', '');
   Result := ReplaceStr(Result, #$1b'[1m', '');
   Result := ReplaceStr(Result, #$1b'[0;1;30m', '');
   Result := ReplaceStr(Result, #$1b'[0;1;31m', '');
   Result := ReplaceStr(Result, #$1b'[0;1;32m', '');
   Result := ReplaceStr(Result, #$1b'[0;1;35m', '');
+  Result := ReplaceStr(Result, #$1b'[01;30m', '');
+  Result := ReplaceStr(Result, #$1b'[01;31m', '');
+  Result := ReplaceStr(Result, #$1b'[01;32m', '');
+  Result := ReplaceStr(Result, #$1b'[01;35m', '');
+  Result := ReplaceStr(Result, #$1b'[K', '');
 end;
 
 function TCECompileViaREST.GetCompileResultFromJson(const JSON: TJSONObject): TCECompileResult;
