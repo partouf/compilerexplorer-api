@@ -46,7 +46,7 @@ type
   end;
 
 const
-  UrlCompilerExplorer = 'https://godbolt.org/beta';
+  UrlCompilerExplorer = 'https://godbolt.org';
 
 implementation
 
