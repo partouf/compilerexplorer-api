@@ -56,7 +56,7 @@ begin
     procedure(Error: TObject)
     begin
       JSONObj.Free;
-      FHasErrors := True;
+      ReportError(Error);
     end
   );
 end;

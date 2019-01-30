@@ -15,6 +15,7 @@ type
   protected
     FCompareDelegate: IComparer<TCELanguage>;
 
+    procedure ClearErrors;
     function GetLanguagesFromJson(const Json: TJsonArray): TCELanguages;
   public
     constructor Create;
@@ -48,8 +49,15 @@ begin
   inherited;
 end;
 
+procedure TCELanguagesFromRest.ClearErrors;
+begin
+  FHasErrors := False;
+end;
+
 procedure TCELanguagesFromRest.GetLanguages(const Callback: TProc<TCELanguages>);
 begin
+  ClearErrors;
+
   FRestRequest.ExecuteAsync(
     procedure
     var
@@ -64,7 +72,7 @@ begin
     True,
     procedure(Error: TObject)
     begin
-      FHasErrors := True;
+      ReportError(Error);
     end
   );
 end;

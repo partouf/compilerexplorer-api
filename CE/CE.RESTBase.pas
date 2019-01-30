@@ -4,10 +4,12 @@ interface
 
 uses
   REST.Client,
-  IPPeerClient;
+  System.SysUtils,
+  IPPeerClient,
+  CE.Interfaces;
 
 type
-  TCERESTBase = class(TInterfacedObject)
+  TCERESTBase = class(TInterfacedObject, ICERestBase)
   protected
     FHasReceivedData: Boolean;
     FHasErrors: Boolean;
@@ -16,15 +18,21 @@ type
     FRestRequest: TRESTRequest;
     FRestClient: TRESTClient;
 
+    FErrorCallback: TProc<string>;
+
+    procedure ReportError(const ErrorMessage: string); overload;
+    procedure ReportError(const ErrorObject: TObject); overload;
   public
     constructor Create;
     destructor Destroy; override;
+
+    procedure SetErrorCallback(const Callback: TProc<string>);
+
+    property HasErrors: Boolean
+      read FHasErrors;
   end;
 
 implementation
-
-uses
-  CE.Interfaces;
 
 { TCERESTBase }
 
@@ -51,6 +59,32 @@ begin
   FRestResponse.Free;
 
   inherited;
+end;
+
+procedure TCERESTBase.ReportError(const ErrorMessage: string);
+begin
+  FHasErrors := True;
+  if Assigned(FErrorCallback) then
+  begin
+    FErrorCallback(ErrorMessage);
+  end;
+end;
+
+procedure TCERESTBase.ReportError(const ErrorObject: TObject);
+begin
+  if ErrorObject is Exception then
+  begin
+    ReportError(Exception(ErrorObject).Message);
+  end
+  else
+  begin
+    ReportError(ErrorObject.ClassName);
+  end;
+end;
+
+procedure TCERESTBase.SetErrorCallback(const Callback: TProc<string>);
+begin
+  FErrorCallback := Callback;
 end;
 
 end.

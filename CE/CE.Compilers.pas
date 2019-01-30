@@ -54,7 +54,7 @@ begin
     True,
     procedure(Error: TObject)
     begin
-      FHasErrors := True;
+      ReportError(Error);
     end
   );
 end;
