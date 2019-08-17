@@ -65,7 +65,6 @@ function TCECompileViaREST.CreateJSONCompileRequest(const Code, Arguments: strin
 var
   Options: TJSONObject;
   Lib: TCELibraryVersion;
-  Path: string;
   Libraries: TJSONArray;
   LibObj: TJSONObject;
 begin
