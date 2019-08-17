@@ -17,7 +17,7 @@ type
 implementation
 
 uses
-  System.JSON, REST.Types;
+  System.JSON, REST.Types, Underscore.Delphi.Springless;
 
 { TCELinkSaver }
 
@@ -34,7 +34,7 @@ var
   State: TCEClientState;
   Session: TCEClientStateSession;
   Compiler: TCEClientStateCompiler;
-  Lib: TCELibraryVersion;
+  LibList: TList<TCEClientStateLibraryVersion>;
 begin
   State := TCEClientState.Create;
   Session := TCEClientStateSession.Create;
@@ -46,12 +46,15 @@ begin
   Compiler.Id := CompilerId;
   Compiler.Arguments := Arguments;
 
-  for Lib in SelectedLibraries do
-  begin
-    Compiler.Libs.Add(
-      TCEClientStateLibraryVersion.Create(
-        Lib.lib.Id,
-        Lib.Version));
+  LibList := _.Map<TCELibraryVersion, TCEClientStateLibraryVersion>(SelectedLibraries,
+    function(const Lib: TCELibraryVersion): TCEClientStateLibraryVersion
+    begin
+      Result := TCEClientStateLibraryVersion.Create(Lib.lib.Id, Lib.Version);
+    end);
+  try
+    Compiler.Libs.AddRange(LibList);
+  finally
+    LibList.Free;
   end;
 
   Session.Compilers.Add(Compiler);
@@ -64,12 +67,22 @@ begin
     procedure
     var
       Response: TJSONObject;
+      StoredId: TJSONValue;
+      StoredUrl: TJSONValue;
     begin
       Response := FRestResponse.JSONValue as TJSONObject;
 
       FHasReceivedData := True;
 
-      Callback(Response.GetValue('storedId').Value);
+      StoredId := Response.GetValue('storedId');
+      StoredUrl := Response.GetValue('url');
+
+      if Assigned(StoredId) then
+        Callback(StoredId.Value)
+      else if Assigned(StoredUrl) then
+        Callback(StoredUrl.Value)
+      else
+        ReportError(Response);
     end,
     False,
     True,

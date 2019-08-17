@@ -16,7 +16,7 @@ type
     FCompareDelegate: IComparer<TCELanguage>;
 
     procedure ClearErrors;
-    function GetLanguagesFromJson(const Json: TJsonArray): TCELanguages;
+    function GetLanguagesFromJson(const JSON: TJsonArray): TCELanguages;
   public
     constructor Create;
     destructor Destroy; override;
@@ -27,7 +27,8 @@ type
 implementation
 
 uses
-  System.Generics.Collections;
+  System.Generics.Collections,
+  Underscore.Delphi.Springless;
 
 { TCELanguages }
 
@@ -63,32 +64,30 @@ begin
     var
       Languages: TCELanguages;
     begin
-      Languages := GetLanguagesFromJson(FRestResponse.JSONValue as TJSONArray);
+      Languages := GetLanguagesFromJson(FRestResponse.JSONValue as TJsonArray);
       FHasReceivedData := True;
 
       Callback(Languages);
-    end,
-    False,
-    True,
+    end, False, True,
     procedure(Error: TObject)
     begin
       ReportError(Error);
-    end
-  );
+    end);
 end;
 
-function TCELanguagesFromRest.GetLanguagesFromJson(const Json: TJsonArray): TCELanguages;
+function TCELanguagesFromRest.GetLanguagesFromJson(const JSON: TJsonArray)
+  : TCELanguages;
 var
-  Lang: TJsonValue;
   LangObject: TJSONObject;
   DefCompiler: TJSONValue;
   DefCompilerStr: string;
+  MappedList: TList<TCELanguage>;
+  Lang: TJSONValue;
 begin
-  Result := TCELanguages.Create;
-
-  for Lang in Json do
+  MappedList := TList<TCELanguage>.Create;
+  for Lang in JSON do
   begin
-    LangObject := (Lang as TJsonObject);
+    LangObject := (Lang as TJSONObject);
 
     DefCompiler := LangObject.GetValue('defaultCompiler');
     if Assigned(DefCompiler) then
@@ -96,17 +95,18 @@ begin
     else
       DefCompilerStr := '';
 
-    Result.Add(
-      TCELanguage.Create(
-        LangObject.GetValue('id').Value,
-        LangObject.GetValue('name').Value,
-        LangObject.GetValue('example').Value,
-        DefCompilerStr
-      )
-    );
+    MappedList.Add(TCELanguage.Create(LangObject.GetValue('id').Value,
+      LangObject.GetValue('name').Value, LangObject.GetValue('example').Value,
+      DefCompilerStr));
   end;
 
-  Result.Sort(FCompareDelegate);
+  try
+    Result := TCELanguages.Create;
+    Result.AddRange(MappedList.ToArray);
+    Result.Sort(FCompareDelegate);
+  finally
+    MappedList.Free;
+  end;
 end;
 
 end.

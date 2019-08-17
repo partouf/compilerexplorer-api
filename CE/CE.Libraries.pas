@@ -54,6 +54,9 @@ var
 begin
   Result := TCELibraries.Create;
 
+  if not Assigned(LibrariesArr) then
+    Exit;
+
   for LibVal in LibrariesArr do
   begin
     LibObj := LibVal as TJSONObject;

@@ -64,9 +64,10 @@ end;
 function TCECompileViaREST.CreateJSONCompileRequest(const Code, Arguments: string; const SelectedLibraries: TList<TCELibraryVersion>): TJSONObject;
 var
   Options: TJSONObject;
-  MoreArguments: string;
   Lib: TCELibraryVersion;
   Path: string;
+  Libraries: TJSONArray;
+  LibObj: TJSONObject;
 begin
   Result := TJSONObject.Create;
 
@@ -74,17 +75,18 @@ begin
 
   Options := TJSONObject.Create;
 
-  MoreArguments := '';
+  Libraries := TJSONArray.Create;
   for Lib in SelectedLibraries do
   begin
-    for Path in Lib.Paths do
-    begin
-      // todo: use compiler includeFlag
-      MoreArguments := MoreArguments + ' -I"' + Path + '"';
-    end;
+    LibObj := TJSONObject.Create;
+    LibObj.AddPair('id', Lib.Lib.Id);
+    LibObj.AddPair('version', Lib.Version);
+
+    Libraries.Add(LibObj);
   end;
 
-  Options.AddPair('userArguments', Arguments + MoreArguments);
+  Options.AddPair('userArguments', Arguments);
+  Options.AddPair('libraries', Libraries);
 
   Result.AddPair('options', Options);
 end;

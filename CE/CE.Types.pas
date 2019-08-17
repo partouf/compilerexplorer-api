@@ -116,6 +116,9 @@ type
 
 implementation
 
+uses
+  Underscore.Delphi.Springless;
+
 { TCELanguage }
 
 constructor TCELanguage.Create(const Id, Name, Example, DefaultCompilerId: string);
@@ -167,37 +170,23 @@ end;
 { TCELanguages }
 
 function TCELanguages.GetById(const Id: string): TCELanguage;
-var
-  Language: TCELanguage;
 begin
-  Result := nil;
-
-  for Language in Self do
-  begin
-    if Language.Id = Id then
+  Result := _.FindOrDefault<TCELanguage>(Self,
+    function(const Language: TCELanguage): Boolean
     begin
-      Result := Language;
-      Exit;
-    end;
-  end;
+      Result := Language.Id = Id;
+    end, nil);
 end;
 
 { TCECompilers }
 
 function TCECompilers.FindById(const Id: string): TCECompiler;
-var
-  Compiler: TCECompiler;
 begin
-  Result := nil;
-
-  for Compiler in Self do
-  begin
-    if Compiler.CompilerId = Id then
+  Result := _.FindOrDefault<TCECompiler>(Self,
+    function(const Compiler: TCECompiler): Boolean
     begin
-      Result := Compiler;
-      Exit;
-    end;
-  end;
+      Result := Compiler.CompilerId = Id;
+    end, nil);
 end;
 
 { TCELibrary }
@@ -241,19 +230,12 @@ end;
 { TCELibraries }
 
 function TCELibraries.GetLibraryById(const Id: string): TCELibrary;
-var
-  Lib: TCELibrary;
 begin
-  Result := nil;
-
-  for Lib in Self do
-  begin
-    if Lib.Id = Id then
+  Result := _.FindOrDefault<TCELibrary>(Self,
+    function(const Lib: TCELibrary): Boolean
     begin
-      Result := Lib;
-      Exit;
-    end;
-  end;
+      Result := Lib.Id = Id;
+    end, nil);
 end;
 
 function TCELibraries.GetLibraryVersion(const LibraryId, Version: string): TCELibraryVersion;
@@ -261,20 +243,18 @@ var
   Lib: TCELibrary;
   LibVersion: TCELibraryVersion;
 begin
-  Result := nil;
-
   Lib := GetLibraryById(LibraryId);
   if Assigned(Lib) then
   begin
-    for LibVersion in Lib.Versions do
-    begin
-      if LibVersion.Version = Version then
+    Result := _.FindOrDefault<TCELibraryVersion>(
+      Lib.Versions,
+      function(const Item: TCELibraryVersion): Boolean
       begin
-        Result := LibVersion;
-        Exit;
-      end;
-    end;
-  end;
+        Result := LibVersion.Version = Version;
+      end, nil);
+  end
+  else
+    Result := nil;
 end;
 
 end.
