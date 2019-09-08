@@ -241,7 +241,6 @@ end;
 function TCELibraries.GetLibraryVersion(const LibraryId, Version: string): TCELibraryVersion;
 var
   Lib: TCELibrary;
-  LibVersion: TCELibraryVersion;
 begin
   Lib := GetLibraryById(LibraryId);
   if Assigned(Lib) then
@@ -250,7 +249,7 @@ begin
       Lib.Versions,
       function(const Item: TCELibraryVersion): Boolean
       begin
-        Result := LibVersion.Version = Version;
+        Result := Item.Version = Version;
       end, nil);
   end
   else

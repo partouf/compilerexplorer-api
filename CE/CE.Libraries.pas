@@ -51,6 +51,8 @@ var
   LibVersion: TCELibraryVersion;
   PathsArr: TJSONArray;
   Path: TJSONValue;
+  UrlVal: TJSONValue;
+  LibUrl: string;
 begin
   Result := TCELibraries.Create;
 
@@ -61,10 +63,16 @@ begin
   begin
     LibObj := LibVal as TJSONObject;
 
+    UrlVal := LibObj.GetValue('url');
+    if Assigned(UrlVal) then
+      LibUrl := UrlVal.Value
+    else
+      LibUrl := '';
+
     Lib := TCELibrary.Create(
       LibObj.GetValue('id').Value,
       LibObj.GetValue('name').Value,
-      LibObj.GetValue('url').Value);
+      LibUrl);
 
     DescVal := LibObj.GetValue('description');
     if Assigned(DescVal) then
